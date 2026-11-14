@@ -42,3 +42,22 @@ bool asignar_contigua(Disco *disco, Archivo *archivo, int tamano_bloque_kb) { //
 
     return true; // Retorna true indicando que la asignación fue exitosa
 }
+
+int acceder_contigua(Archivo *archivo, int posicion_logica, int tamano_bloque_kb, int *accesos_necesarios) { // Accede a un bloque específico de un archivo contiguo en el disco
+    if (!archivo || tamano_bloque_kb <= 0 || archivo->cantidad_bloques == 0) { // Verifica si los parámetros son válidos
+        if (accesos_necesarios) *accesos_necesarios = 0; // Si el puntero de accesos_necesarios no es nulo, asigna 0 indicando que no se realizaron accesos
+        return -1; // Retorna -1 indicando que no se pudo acceder al bloque
+    }
+
+    int indice_bloque_logico = posicion_logica / tamano_bloque_kb; // Calcula el índice del bloque lógico correspondiente a la posición lógica proporcionada
+    if (indice_bloque_logico < 0 || indice_bloque_logico >= archivo->cantidad_bloques) { // Verifica si el índice del bloque lógico está dentro de los límites del archivo
+        if (accesos_necesarios) *accesos_necesarios = 0; // Si el puntero de accesos_necesarios no es nulo, asigna 0 indicando que no se realizaron accesos
+        return -1; // Retorna -1 indicando que la posición lógica está fuera de los límites del archivo
+    }
+
+    if (accesos_necesarios) { // Si el puntero de accesos_necesarios no es nulo, asigna 1 indicando que se realizó un acceso
+        *accesos_necesarios = 1; // Asigna 1 indicando que se realizó un acceso
+    }
+
+    return archivo->bloques_datos[indice_bloque_logico]; // Retorna la posición física del bloque correspondiente al índice del bloque lógico
+}
