@@ -57,3 +57,28 @@ bool asignar_indexada(Disco *disco, Archivo *archivo, int tamano_bloque_kb) { //
 
     return true; // Retorna true indicando que la asignación fue exitosa
 }
+
+// Función para acceder a un bloque específico de un archivo indexado en el disco
+int acceder_indexada(Disco *disco, Archivo *archivo, int posicion_logica, int tamano_bloque_kb, int *accesos_necesarios) { // Accede a un bloque específico de un archivo indexado en el disco
+    if (!disco || !archivo || tamano_bloque_kb <= 0 || archivo->cantidad_bloques == 0) { // Verifica si los punteros son válidos y si el tamaño de bloque es positivo y si el archivo tiene bloques asignados
+        if (accesos_necesarios) *accesos_necesarios = 0; // Si el puntero de accesos_necesarios no es NULL, establece el valor a 0
+        return -1;
+    }
+
+    int indice_bloque_logico = posicion_logica / tamano_bloque_kb; // Calcula el índice del bloque lógico correspondiente a la posición lógica solicitada
+    if (indice_bloque_logico < 0 || indice_bloque_logico >= archivo->cantidad_bloques) { // Verifica si el índice del bloque lógico está dentro del rango válido de bloques asignados al archivo
+        if (accesos_necesarios) *accesos_necesarios = 0; // Si el puntero de accesos_necesarios no es NULL, establece el valor a 0
+        return -1; // Retorna -1 indicando que la posición lógica solicitada está fuera del rango válido de bloques asignados al archivo
+    }
+
+    if (accesos_necesarios) { // Si el puntero de accesos_necesarios no es NULL, establece el valor a 2 (1 acceso al bloque índice y 1 acceso al bloque de datos)
+        *accesos_necesarios = 2; // 1 acceso al bloque índice y 1 acceso al bloque de datos
+    }
+
+    int pos_bloque_indice = archivo->bloque_indice; // Obtiene la posición del bloque índice del archivo
+    if (pos_bloque_indice < 0 || pos_bloque_indice >= disco->total_bloques) { // Verifica si la posición del bloque índice está dentro del rango válido de bloques del disco
+        return -1; // Retorna -1 indicando que la posición del bloque índice está fuera del rango válido de bloques del disco
+    }
+
+    return disco->bloques[pos_bloque_indice].indices[indice_bloque_logico]; // Retorna la posición física del bloque de datos correspondiente al índice del bloque lógico solicitado
+}
