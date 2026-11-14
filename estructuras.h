@@ -25,6 +25,7 @@ typedef struct {
     int tamano_kb; // Tamaño del archivo en kilobytes
     int *bloques_datos; // Puntero a un arreglo de índices de bloques que contienen los datos del archivo
     int cantidad_bloques; // Número de bloques que contiene el archivo
+    int bloque_indice; // Bloque índice utilizado (para asignación indexada) <--- ¡Aquí lo agregas!
 } Archivo;
 
 // Funciones para manejar el disco y los archivos
